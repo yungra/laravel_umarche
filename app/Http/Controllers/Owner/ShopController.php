@@ -33,8 +33,9 @@ class ShopController extends Controller
 
     public function index()
     {
-        $ownerId = Auth::id(); //ログインしてるオーナのIDを取得
-        $shops = Shop::where('owner_id', $ownerId)->get(); //DBから一致するものを取得
+        // $ownerId = Auth::id(); //ログインしてるオーナのIDを取得
+        // $shops = Shop::where('owner_id', $ownerId)->get(); //DBから一致するものを取得
+        $shops = Shop::where('owner_id', Auth::id())->get(); //↑これらを一行にまとめた
 
         return view('owner.shops.index', compact('shops'));
     }
