@@ -18,7 +18,7 @@ class Shop extends Model
         'is_selling'
     ];
 
-    public function Owner()
+    public function owner()
     {
         return $this->belongsTo(Owner::class);
     }
