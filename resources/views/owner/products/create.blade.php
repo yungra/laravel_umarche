@@ -15,20 +15,23 @@
                         <div class="-m-2">
                             <div class="p-2 w-1/2 mx-auto">
                                 <div class="relative">
-                                  
-                                  <select name="category">
-                                    @foreach($categories as $category)
-                                    <optgroup label="{{ $category->name }}">
-                                    @foreach($category->secondary as $secondary)
-                                    <option value="{{ $secondary->id}}" >
-                                    {{ $secondary->name }}
-                                    </option>
-                                    @endforeach
-                                    @endforeach
-                                  </select>
 
+                                    <select name="category">
+                                        @foreach ($categories as $category)
+                                            <optgroup label="{{ $category->name }}">
+                                                @foreach ($category->secondary as $secondary)
+                                                    <option value="{{ $secondary->id }}">
+                                                        {{ $secondary->name }}
+                                                    </option>
+                                                @endforeach
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
+                            <x-select-image :images="$images" name="image1" />
+                            <x-select-image :images="$images" name="image2" />
+                            <x-select-image :images="$images" name="image3" />
+                            <x-select-image :images="$images" name="image4" />
 
                             <div class="p-2 w-full flex justify-around mt-4">
                                 <button type="button" onclick="location.href='{{ route('owner.products.index') }}'"
@@ -42,4 +45,21 @@
             </div>
         </div>
     </div>
+    <script>
+        'use strict'
+        const images = document.querySelectorAll('.image') //全てのimageタグを取得
+        images.forEach(image => { // 1つずつ繰り返す
+            image.addEventListener('click', function(e) { // クリックしたら
+                const imageName = e.target.dataset.id.substr(0, 6) //data-idの6文字
+                const imageId = e.target.dataset.id.replace(imageName + '_', '') // 6文字カット
+                const imageFile = e.target.dataset.file
+                const imagePath = e.target.dataset.path
+                const modal = e.target.dataset.modal
+                // サムネイルと input type=hiddenのvalueに設定
+                document.getElementById(imageName + '_thumbnail').src = imagePath + '/' + imageFile
+                document.getElementById(imageName + '_hidden').value = imageId
+                MicroModal.close(modal); //モーダルを閉じる
+            })
+        })
+    </script>
 </x-app-layout>

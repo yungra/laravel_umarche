@@ -29,8 +29,6 @@
                                         <div class="text-gray-700">{{ $image->title }}</div>
                                     </div>
                                 </a>
-
-
                             </div>
                         @endforeach
                     </div>
