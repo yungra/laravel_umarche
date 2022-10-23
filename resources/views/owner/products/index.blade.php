@@ -25,7 +25,7 @@
                                         <div class="border rounded-md md:p-4">
 
                                             <x-thumbnail filename="{{$product->imageFirst->filename ?? ''}}" type="products" />
-                                            {{-- <div class="text-gray-700">{{ $product->name }}</div> --}}
+                                            <div class="text-gray-700">{{ $product->name }}</div>
                                         </div>
                                     </a>
 
