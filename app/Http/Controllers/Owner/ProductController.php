@@ -198,12 +198,12 @@ class ProductController extends Controller
                     $product->image4 = $request->image4;
                     $product->is_selling = $request->is_selling;
                     $product->save();
-    
-                    if($request->type === \Constant::PRODUCT_LIST['add']){
+
+                    if ($request->type === \Constant::PRODUCT_LIST['add']) {
                         $newQuantity = $request->quantity;
                     }
-                    if($request->type === \Constant::PRODUCT_LIST['reduce']){
-                        $newQuantity = $request->quantity *-1;
+                    if ($request->type === \Constant::PRODUCT_LIST['reduce']) {
+                        $newQuantity = $request->quantity * -1;
                     }
                     Stock::create([
                         'product_id' => $product->id,
@@ -215,8 +215,8 @@ class ProductController extends Controller
                 Log::error($e);
                 throw $e;
             }
-    
-    
+
+
             return redirect()
                 ->route('owner.products.index')
                 ->with([
@@ -226,14 +226,15 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        Product::findOrFail($id)->delete();
+
+        return redirect()
+            ->route('owner.products.index')
+            ->with([
+                'message' => '商品を削除しました。',
+                'status' => 'alert'
+            ]);
     }
 }
