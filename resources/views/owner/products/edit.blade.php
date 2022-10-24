@@ -117,7 +117,7 @@
                                 <x-select-image :images="$images" currentId="{{ $product->image3 }}"
                                     currentImage="{{ $product->imageThird->filename ?? '' }}" name="image3" />
                                 <x-select-image :images="$images" currentId="{{ $product->image4 }}"
-                                    currentImage="{{ $product->imageForth->filename ?? '' }}" name="image4" />
+                                    currentImage="{{ $product->imageFourth->filename ?? '' }}" name="image4" />
                                 <x-select-image :images="$images" name="image5" />
                                 <div class="p-2 w-1/2 mx-auto">
                                     <div class="relative flex justify-around">
