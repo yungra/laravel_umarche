@@ -63,8 +63,9 @@ class CartController extends Controller
 
         $lineItems = [];
         foreach ($products as $product) {
+            //在庫を確認
+            $quantity = "";
             $quantity = Stock::where('product_id', $product->id)->sum('quantity');
-
             if ($product->pivot->quantity > $quantity) {
                 return redirect()->route('user.cart.index');
             } else {
@@ -77,45 +78,57 @@ class CartController extends Controller
                 // ];
                 // array_push($lineItems, $lineItem);
 
-                $lineItem = [[
-                    "price_data" => [
-                        "unit_amount" => $product->price,
-                        "currency" => 'jpy',
-                        "product_data" => [
-                            "name" => $product->name,
-                            "description" => $product->information,
+                $lineItem = [
+                    [
+                        "price_data" => [
+                            "unit_amount" => $product->price,
+                            "currency" => 'jpy',
+                            "product_data" => [
+                                "name" => $product->name,
+                                "description" => $product->information,
+                            ],
                         ],
-                    ],
-                    "quantity" => $product->pivot->quantity,
-                ]];
+                        "quantity" => $product->pivot->quantity,
+                    ]
+                ];
                 array_push($lineItems, $lineItem);
             }
         }
         // dd($lineItems);
 
-        foreach ($products as $product) {
-            Stock::create([
-                'product_id' => $product->id,
-                'type' => \Constant::PRODUCT_LIST['reduce'],
-                'quantity' => $product->pivot->quantity * -1,
-            ]);
-        }
-        // dd('test');
+        //↓後で戻さないと、DBに反映されない
+        // foreach ($products as $product) {
+        //     Stock::create([
+        //         'product_id' => $product->id,
+        //         'type' => \Constant::PRODUCT_LIST['reduce'],
+        //         'quantity' => $product->pivot->quantity * -1,
+        //     ]);
+        // }
+        
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
 
-        $session = $checkout_session = \Stripe\Checkout\Session::create([
-            // 'payment_method_types' => ['card'],
+        $session = \Stripe\Checkout\Session::create([
+            'payment_method_types' => ['card'],
             'line_items' => [$lineItems],
             'mode' => 'payment',
-            'success_url' => route('user.items.index'),
+            'success_url' => route('user.cart.success'),
             'cancel_url' => route('user.cart.index'),
         ]);
 
-        $publicKey = env('STRIPE_PUBLIC_KEY');
+        // $publicKey = env('STRIPE_PUBLIC_KEY');
+        // return view(
+        //     'user.checkout',
+        //     compact('session', 'publicKey')
+        // );
 
-        return view(
-            'user.checkout',
-            compact('session', 'publicKey')
-        );
+        // dd($lineItems);
+        return redirect($session->url, 303);
+    }
+
+    public function success() 
+    {
+        Cart::where('user_id', Auth::id())->delete();
+
+        return redirect(route('user.items.index'));
     }
 }
