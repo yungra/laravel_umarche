@@ -66,6 +66,7 @@ class CartController extends Controller
             //在庫を確認
             $quantity = "";
             $quantity = Stock::where('product_id', $product->id)->sum('quantity');
+
             if ($product->pivot->quantity > $quantity) {
                 return redirect()->route('user.cart.index');
             } else {
@@ -78,19 +79,21 @@ class CartController extends Controller
                 // ];
                 // array_push($lineItems, $lineItem);
 
-                $lineItem = [
+                $lineItem =
                     [
-                        "price_data" => [
-                            "unit_amount" => $product->price,
-                            "currency" => 'jpy',
-                            "product_data" => [
-                                "name" => $product->name,
-                                "description" => $product->information,
+                        [
+                            "price_data" => [
+                                "unit_amount" => $product->price,
+                                "currency" => 'jpy',
+                                "product_data" => [
+                                    "name" => $product->name,
+                                    "description" => $product->information,
+                                ],
                             ],
-                        ],
-                        "quantity" => $product->pivot->quantity,
-                    ]
-                ];
+                            "quantity" => $product->pivot->quantity,
+                        ]
+                    ];
+
                 array_push($lineItems, $lineItem);
             }
         }
