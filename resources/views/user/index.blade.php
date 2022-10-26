@@ -75,9 +75,9 @@
 
                     </div>
                     {{ $products->appends([
-                        'sort' => \Request::get('sort'),
-                        'pagination' => \Request::get('pagination')
-                    ])->links() }}
+                            'sort' => \Request::get('sort'),
+                            'pagination' => \Request::get('pagination'),
+                        ])->links() }}
                 </div>
             </div>
         </div>
@@ -88,7 +88,7 @@
             this.form.submit()
         })
         const paginate = document.getElementById('pagination')
-        select.addEventListener('change', function() {
+        paginate.addEventListener('change', function() {
             this.form.submit()
         })
     </script>
