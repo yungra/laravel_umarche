@@ -81,17 +81,15 @@ class CartController extends Controller
 
                 $lineItem =
                     [
-                        [
-                            "price_data" => [
-                                "unit_amount" => $product->price,
-                                "currency" => 'jpy',
-                                "product_data" => [
-                                    "name" => $product->name,
-                                    "description" => $product->information,
-                                ],
+                        "price_data" => [
+                            "unit_amount" => $product->price,
+                            "currency" => 'jpy',
+                            "product_data" => [
+                                "name" => $product->name,
+                                "description" => $product->information,
                             ],
-                            "quantity" => $product->pivot->quantity,
-                        ]
+                        ],
+                        "quantity" => $product->pivot->quantity,
                     ];
 
                 array_push($lineItems, $lineItem);
