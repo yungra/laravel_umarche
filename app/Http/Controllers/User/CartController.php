@@ -16,10 +16,12 @@ class CartController extends Controller
 {
     public function index()
     {
+        // ログインしてるユーザidでデータを取得
         $user = User::findOrFail(Auth::id());
         $products = $user->products;
         $totalPrice = 0;
 
+        // 小計を計算
         foreach ($products as $product) {
             $totalPrice += $product->price * $product->pivot->quantity;
         }
@@ -32,15 +34,20 @@ class CartController extends Controller
         );
     }
 
+    // カートに入れるを実行した時の処理
     public function add(Request $request)
     {
+        // 追加しようとしてる商品と一致するもの
         $itemInCart = Cart::where('product_id', $request->product_id)
+            // ログインユーザと一致するもの
             ->where('user_id', Auth::id())->first();
 
+        // 既にカートに存在すれば量だけ変更
         if ($itemInCart) {
             $itemInCart->quantity += $request->quantity;
             $itemInCart->save();
         } else {
+            // まだ存在しない場合、createでインスタンス作成
             Cart::create([
                 'user_id' => Auth::id(),
                 'product_id' => $request->product_id,

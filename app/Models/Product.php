@@ -70,12 +70,16 @@ class Product extends Model
             ->withPivot(['id', 'quantity']);
     }
 
+    // ローカルスコープ
+    // 販売中の商品を取得するクエリ
     public function scopeAvailableItems($query)
     {
+        // 在庫数が1以上
         $stocks = DB::table('t_stocks')
+            // 'product_id'と
             ->select(
                 'product_id',
-                DB::raw('sum(quantity) as quantity')
+                DB::raw('sum(quantity) as quantity') //DB::raw→SQL文を直接書ける
             )
             ->groupBy('product_id')
             ->having('quantity', '>', 1);
@@ -144,6 +148,7 @@ class Product extends Model
 
             //単語をループで回す
             foreach ($keyword as $word) {
+                // %→0文字以上の任意の文字。あいまい検索をしてる
                 $query->where('products.name', 'like', '%' . $word . '%');
             }
         } else {

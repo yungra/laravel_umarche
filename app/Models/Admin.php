@@ -15,6 +15,8 @@ class Admin extends Authenticatable
      *
      * @var array<int, string>
      */
+    // fillable→ホワイトリスト。ここで指定した値のみ代入できる
+    // guarded→ブラックリスト。ここで指定した値以外代入できる
     protected $fillable = [
         'name',
         'email',
@@ -26,6 +28,7 @@ class Admin extends Authenticatable
      *
      * @var array<int, string>
      */
+    // hidden→データ取得しないフィールドを指定
     protected $hidden = [
         'password',
         'remember_token',
@@ -36,6 +39,7 @@ class Admin extends Authenticatable
      *
      * @var array<string, string>
      */
+    // データを自動変換する
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];

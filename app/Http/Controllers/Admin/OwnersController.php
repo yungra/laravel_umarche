@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Owner; //Eloquent エロクアント
-use App\Models\Shop; 
+use App\Models\Shop;
 use Illuminate\Support\Facades\DB; //QueryBuilderクエリビルダ
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -23,9 +23,11 @@ class OwnersController extends Controller
 
     public function __construct()
     {
+        // 管理者がログインしてるか認証
         $this->middleware('auth:admin');
     }
 
+    // オーナー一覧表示用
     public function index()
     {
         // $data_now = Carbon::now();
@@ -44,38 +46,32 @@ class OwnersController extends Controller
 
         // var_dump($q_first);
 
-        // dd($e_all, $q_get, $q_first, $c_test);
+        // オーナー情報一覧をDBから取ってくる
         $owners = Owner::select('id', 'name', 'email', 'created_at')
-        ->paginate(3);
+            ->paginate(3);
         return view('admin.owners.index', compact('owners'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+    // 新規オーナー登録画面に遷移
     public function create()
     {
         return view('admin.owners.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // 新規オーナーをDBに登録
     public function store(Request $request)
     {
+        // 入力値にバリデーションをかける
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:owners'],
             'password' => 'required|string|confirmed|min:8',
         ]);
 
-        try{
-            DB::transaction(function () use($request) {
+        // オーナーと同時にショップも作成するので、トランザクションをかける
+        try {
+            DB::transaction(function () use ($request) {
                 $owner = Owner::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -89,9 +85,8 @@ class OwnersController extends Controller
                     'filename' => '',
                     'is_selling' => true
                 ]);
-
             }, 2);
-        }catch(Throwable $e){
+        } catch (Throwable $e) {
             Log::error($e);
             throw $e;
         }
@@ -116,12 +111,7 @@ class OwnersController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    // 編集用画面に遷移
     public function edit($id)
     {
         $owner = Owner::findOrFail($id);
@@ -129,13 +119,7 @@ class OwnersController extends Controller
         return view('admin.owners.edit', compact('owner'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    // 編集内容をDBに保存
     public function update(Request $request, $id)
     {
         $owner = Owner::findOrFail($id);
@@ -152,12 +136,7 @@ class OwnersController extends Controller
             ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    // 削除用
     public function destroy($id)
     {
         Owner::findOrFail($id)->delete(); //ソフトデリート
@@ -170,14 +149,18 @@ class OwnersController extends Controller
             ]);
     }
 
+    // オーナー一覧から削除したデータ一覧
     public function expiredOwnerIndex()
     {
+        // ソフトデリート(論理削除)されたデータを取得
         $expiredOwners = Owner::onlyTrashed()->get();
         return view(
             'admin.expired-owners',
             compact('expiredOwners')
         );
     }
+
+    // 物理削除する
     public function expiredOwnerDestroy($id)
     {
         Owner::onlyTrashed()->findOrFail($id)->forceDelete();

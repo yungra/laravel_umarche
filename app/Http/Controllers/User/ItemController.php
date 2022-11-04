@@ -17,11 +17,14 @@ class ItemController extends Controller
 
     public function __construct()
     {
+        // ログインしてるユーザか確認
         $this->middleware('auth:users');
 
         $this->middleware(function ($request, $next) {
 
+            // 'item'パラメータを取得
             $id = $request->route()->parameter('item');
+            // 販売してない商品を表示しないよう設定
             if (!is_null($id)) { // null判定
                 $itemId = Product::availableItems()->where('products.id', $id)->exists();
                 if (!$itemId) { //存在しなかったら
@@ -47,6 +50,7 @@ class ItemController extends Controller
         $categories = PrimaryCategory::with('secondary')
             ->get();
 
+        //検索設定により表示を変更
         $products = Product::availableItems()
         ->selectCategory($request->category ?? '0')
         ->searchKeyword($request->keyword)
@@ -59,9 +63,11 @@ class ItemController extends Controller
     public function show($id)
     {
         $product = Product::findOrFail($id);
+        // 在庫の残り数を計算
         $quantity = Stock::where('product_id', $product->id)
             ->sum('quantity');
 
+        // 在庫数が9個以上なら表示は9
         if ($quantity > 9) {
             $quantity = 9;
         }

@@ -19,6 +19,7 @@ class ImageController extends Controller
 {
     public function __construct()
     {
+        // オーナーがログインしているか認証
         $this->middleware('auth:owners');
 
         $this->middleware(function ($request, $next) {
@@ -39,7 +40,7 @@ class ImageController extends Controller
     public function index()
     {
         $images = Image::where('owner_id', Auth::id())
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('updated_at', 'desc') // 降順に並べる。asc→昇順
             ->paginate(20);
         return view('owner.images.index', compact('images'));
     }
@@ -124,6 +125,7 @@ class ImageController extends Controller
     {
         $image = Image::findOrFail($id);
 
+        // image1~4で削除対象の画像が使われていればProductsテーブルから持ってくる
         $imageInProducts = Product::where('image1', $image->id)
             ->orWhere('image2', $image->id)
             ->orWhere('image3', $image->id)
@@ -131,7 +133,10 @@ class ImageController extends Controller
             ->get();
 
         if ($imageInProducts) {
-            $imageInProducts->each(function ($product) use ($image) {
+            // eachメソッド→コレクション内のアイテムを反復処理し、各アイテムをクロージャに渡す
+            // function () use ($変数名)→関数の外で定義してる変数を使えるようにする
+            $imageInProducts->each(function ($product) use ($image) { 
+                // 削除対象の画像が商品に使われていれば削除していく
                 if ($product->image1 === $image->id) {
                     $product->image1 = null;
                     $product->save();
@@ -153,10 +158,12 @@ class ImageController extends Controller
 
         $filePath = '/public/products/' . $image->filename;
 
+        // Storageファサードで画像のファイルを削除
         if (Storage::exists($filePath)) {
             Storage::delete($filePath);
         }
 
+        // Imageテーブルからも削除
         Image::findOrFail($id)->delete();
 
         return redirect()

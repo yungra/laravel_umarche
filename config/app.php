@@ -1,5 +1,7 @@
 <?php
 
+// config/appファイル＝◯◯で〜
+
 return [
 
     /*
@@ -12,9 +14,9 @@ return [
     | any other location as required by the application or its packages.
     |
     */
-
+    //ここでは〜
     'name' => env('APP_NAME', 'Laravel'),
-
+    // envファイルのAPP_NAMEを参照して、
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -190,6 +192,7 @@ return [
     |
     */
 
+    //エイリアスを定義
     'aliases' => [
 
         'App' => Illuminate\Support\Facades\App::class,

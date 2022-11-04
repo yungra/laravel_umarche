@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 class Authenticate extends Middleware
 {
-    protected $user_route = 'user.login';
+    protected $user_route = 'user.login'; //RouteServiceProviderでasを設定していたため、この表記を使える
     protected $owner_route = 'owner.login';
     protected $admin_route = 'admin.login';
     /**
@@ -16,9 +16,11 @@ class Authenticate extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
+
+    // 認証されていない時の、リダイレクト先を設定 
     protected function redirectTo($request)
     {
-        if (! $request->expectsJson()) {
+        if (! $request->expectsJson()) { //Jsonでなかったら
             if(Route::is('owner.*')){
                 return route($this->owner_route);
             } elseif(Route::is('admin.*')){

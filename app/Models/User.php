@@ -43,6 +43,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    // userにつき複数のproductと結ぶつくとわかりやすくするため、クラス名は複数形にしている
     public function products()
     {
     return $this->belongsToMany(Product::class, 'carts')

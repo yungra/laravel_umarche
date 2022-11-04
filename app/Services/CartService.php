@@ -14,6 +14,7 @@ class CartService
     foreach ($items as $item) {
       $p = Product::findOrFail($item->product_id);
       $owner = $p->shop->owner->select('name', 'email')->first()->toArray();
+      // array_values→配列 array から全ての値を取り出し、数値添字をつけた配列を返す
       $values = array_values($owner);
       $keys = ['ownerName', 'email'];
       $ownerInfo = array_combine($keys, $values);

@@ -18,10 +18,13 @@ class ProductController extends Controller
 {
     public function __construct()
     {
+        // Http/Kernel.phpにauthのaliasが登録されてる
+        // ログインしてるオーナーだけが見れるように
         $this->middleware('auth:owners');
 
         $this->middleware(function ($request, $next) {
 
+            // パラメータに紐づくオーナーIDと、ログインしてるオーナーが一致するか確認
             $id = $request->route()->parameter('product');
             if (!is_null($id)) { // null判定
                 $productsOwnerId = Product::findOrFail($id)->shop->owner->id;
@@ -40,6 +43,8 @@ class ProductController extends Controller
         // $products = Owner::findOrFail(Auth::id())->shop->product;
 
         $ownerInfo = Owner::with('shop.product.imageFirst')
+            // 「Auth::id」現在認証しているユーザーのIDを取得
+            // 現在認証しているユーザーと一致するデータを取得
             ->where('id', Auth::id())->get();
 
         // dd($ownerInfo);
@@ -72,6 +77,7 @@ class ProductController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
+        // 子テーブルの情報をまとめて取得
         $categories = PrimaryCategory::with('secondary')
             ->get();
 
@@ -103,6 +109,7 @@ class ProductController extends Controller
             'is_selling' => 'required',
         ]);
 
+        // ProductとStockをトランザクション処理
         try {
             DB::transaction(function () use ($request) {
                 $product = Product::create([
@@ -156,6 +163,7 @@ class ProductController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
+        // 子カテゴリーも一緒に取ってくる
         $categories = PrimaryCategory::with('secondary')
             ->get();
 
@@ -165,6 +173,7 @@ class ProductController extends Controller
         );
     }
 
+    // カスタムリクエスト
     public function update(ProductRequest $request, $id)
     {
         // dd($request);
@@ -176,6 +185,7 @@ class ProductController extends Controller
         $quantity = Stock::where('product_id', $product->id)
             ->sum('quantity');
 
+        // Edit~Update間にユーザが購入したりして、在庫数が変わった場合への対処
         if ($request->current_quantity !== $quantity) {
             $id = $request->route()->parameter('product');
             return redirect()->route('owner.products.edit', ['product' => $id])

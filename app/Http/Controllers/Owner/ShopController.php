@@ -51,6 +51,7 @@ class ShopController extends Controller
         return view('owner.shops.edit', compact('shop'));
     }
 
+    // カスタムリクエスト。バリデーションかけてる
     public function update(UploadImageRequest $request, $id)
     {
         $request->validate([
@@ -72,7 +73,8 @@ class ShopController extends Controller
             //     'public/shops/' . $fileNameToStore,
             //     $resizedImage
             // );
-
+            
+            //↑上記の処理を、サービスに切り離す
             $fileNameToStore = ImageService::upload($imageFile, 'shops');
         }
 

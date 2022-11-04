@@ -17,6 +17,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
+    // ログイン後に飛ばされる画面
     public const HOME = '/';
     public const OWNER_HOME = '/owner/dashboard';
     public const ADMIN_HOME = '/admin/dashboard';
@@ -45,11 +46,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
+            // prefix→URLの接頭辞をグループ化して設定できる
             Route::prefix('owner')
-                ->as('owner.')
+                ->as('owner.') // 別名を付ける
                 ->middleware('web')
                 ->namespace($this->namespace)
-                ->group(base_path('routes/owner.php'));
+                ->group(base_path('routes/owner.php')); //グループの中の全てのrouteに割り当てる
 
             Route::prefix('admin')
                 ->as('admin.')
