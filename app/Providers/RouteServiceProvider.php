@@ -47,6 +47,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/api.php'));
 
             // prefix→URLの接頭辞をグループ化して設定できる
+            // 公式ドキュメント：https://readouble.com/laravel/8.x/ja/routing.html
             Route::prefix('owner')
                 ->as('owner.') // 別名を付ける
                 ->middleware('web')
